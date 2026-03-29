@@ -1,0 +1,147 @@
+
+> yousuf_rice@0.1.0 build /Users/muhammadwahaj/Desktop/yousuf-rice-website
+> next build
+
+▲ Next.js 16.2.1 (Turbopack)
+- Environments: .env
+- Cache Components enabled
+
+  Creating an optimized production build ...
+
+> Build error occurred
+Error: Turbopack build failed with 7 errors:
+./app/auth/login/login-form.tsx:7:1
+Module not found: Can't resolve '@/app/actions/auth'
+  [90m 5 |[0m ...[32mt/link'[0m;
+  [90m 6 |[0m ...[36mom[0m [32m'@/lib/appwr...[0m
+[31m[1m>[0m [90m 7 |[0m ...ByPhone } [36mfrom[0m [32m...[0m
+  [90m   |[0m    [31m[1m^^^^^^^^^^^^^^^^^^[0m
+  [90m 8 |[0m ... } [36mfrom[0m [32m'@/lib/...[0m
+  [90m 9 |[0m ...[36mm[0m [32m'@/components...[0m
+  [90m10 |[0m ... [32m'@/components/...[0m
+
+Import map: aliased to relative './app/actions/auth' inside of [project]/
+
+
+Import trace:
+  Server Component:
+    ./app/auth/login/login-form.tsx
+    ./app/auth/login/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./app/products/[id]/page.tsx:5:1
+Module not found: Can't resolve '@/components/loading-skeletons'
+  [90m3 |[0m ...getCachedProduct...
+  [90m4 |[0m ...[33mUCKET_ID[0m } [36mfrom[0m [32m...[0m
+[31m[1m>[0m [90m5 |[0m ...[33mton[0m } [36mfrom[0m [32m'@/co...[0m
+  [90m  |[0m    [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m6 |[0m ...[36mfrom[0m [32m'./product-...[0m
+  [90m7 |[0m ...[32mext/navigation'[0m;
+  [90m8 |[0m ...
+
+Import map: aliased to relative './components/loading-skeletons' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./app/special-deals/page.tsx:3:1
+Module not found: Can't resolve '@/components/loading-skeletons'
+  [90m1 |[0m ...[32meact'[0m;
+  [90m2 |[0m ...} [36mfrom[0m [32m'@/compon...[0m
+[31m[1m>[0m [90m3 |[0m ...[33mon[0m } [36mfrom[0m [32m'@/com...[0m
+  [90m  |[0m    [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m ...
+  [90m5 |[0m ...
+  [90m6 |[0m ...[33mPartial[0m [33mPrerende...[0m
+
+Import map: aliased to relative './components/loading-skeletons' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./components/async-special-deals.tsx:1:1
+Module not found: Can't resolve '@/components/special-deal-card'
+[31m[1m>[0m [90m1 |[0m ... } [36mfrom[0m [32m'@/compo...[0m
+  [90m  |[0m    [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m2 |[0m ...estaurantProduct...
+  [90m3 |[0m ...[32m'lucide-react'[0m;
+  [90m4 |[0m ...
+
+Import map: aliased to relative './components/special-deal-card' inside of [project]/
+
+
+Import trace:
+  Server Component:
+    ./components/async-special-deals.tsx
+    ./app/special-deals/page.tsx
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./app/api/admin/products/update/route.ts:3:1
+Module not found: Can't resolve '@/lib/auth-utils'
+  [90m1 |[0m ...[33msponse[0m } [36mfrom[0m [32m'n...[0m
+  [90m2 |[0m ...[33mID[0m, [33mPRODUCTS_TAB...[0m
+[31m[1m>[0m [90m3 |[0m ...ns, withAdminAut...
+  [90m  |[0m    [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m4 |[0m ...
+  [90m5 |[0m ...
+  [90m6 |[0m ...duct
+
+Import map: aliased to relative './lib/auth-utils' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./app/api/admin/stats/route.ts:4:1
+Module not found: Can't resolve '@/lib/auth-utils'
+  [90m2 |[0m ...[33mATABASE_ID[0m, [33mORDE...[0m
+  [90m3 |[0m ...[36mm[0m [32m'appwrite'[0m;
+[31m[1m>[0m [90m4 |[0m ...ermissions } [36mfro.[0m.[32m.[0m
+  [90m  |[0m    [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m5 |[0m ...
+  [90m6 |[0m ...[90me dynamic = 'for...[0m
+  [90m7 |[0m ...
+
+Import map: aliased to relative './lib/auth-utils' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+./app/api/chat/route.ts:5:1
+Module not found: Can't resolve '@/lib/server-session-manager'
+  [90m3 |[0m ... [36mfrom[0m [32m'@/lib/age...[0m
+  [90m4 |[0m ... [36mfrom[0m [32m'appwrite'[0m;
+[31m[1m>[0m [90m5 |[0m ...ger } [36mfrom[0m [32m'@/li...[0m
+  [90m  |[0m    [31m[1m^^^^^^^^^^^^^^^^^^^[0m
+  [90m6 |[0m ...
+  [90m7 |[0m ...
+  [90m8 |[0m ...
+
+Import map: aliased to relative './lib/server-session-manager' inside of [project]/
+
+
+https://nextjs.org/docs/messages/module-not-found
+
+
+    at <unknown> (./app/auth/login/login-form.tsx:7:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./app/products/[id]/page.tsx:5:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./app/special-deals/page.tsx:3:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./components/async-special-deals.tsx:1:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./app/api/admin/products/update/route.ts:3:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./app/api/admin/stats/route.ts:4:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+    at <unknown> (./app/api/chat/route.ts:5:1)
+    at <unknown> (https://nextjs.org/docs/messages/module-not-found)
+ ELIFECYCLE  Command failed with exit code 1.
