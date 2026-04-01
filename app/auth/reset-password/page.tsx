@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { account } from '@/lib/appwrite';
+import { authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,26 +11,9 @@ import toast from 'react-hot-toast';
 
 function ResetPasswordForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [userId, setUserId] = useState('');
-  const [secret, setSecret] = useState('');
-
-  useEffect(() => {
-    // Get userId and secret from URL parameters (from Appwrite recovery email)
-    const userIdParam = searchParams.get('userId');
-    const secretParam = searchParams.get('secret');
-    
-    if (userIdParam && secretParam) {
-      setUserId(userIdParam);
-      setSecret(secretParam);
-    } else {
-      toast.error('Invalid reset link. Please request a new password reset.');
-      router.push('/auth/forgot-password');
-    }
-  }, [searchParams, router]);
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,16 +28,16 @@ function ResetPasswordForm() {
       return;
     }
 
-    if (!userId || !secret) {
-      toast.error('Invalid reset link. Please request a new password reset.');
-      return;
-    }
-
     setLoading(true);
 
     try {
-      // Use Appwrite's password recovery completion
-      await account.updateRecovery({ userId: userId, secret: secret, password: newPassword });
+      const { error } = await authClient.resetPassword({
+        newPassword: newPassword,
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
 
       toast.success('Password updated successfully!');
       router.push('/auth/login');

@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { Customer } from '../types-improved';
 import { authClient } from '../auth-client';
 
 // Define permission levels for admin access
@@ -10,33 +9,28 @@ export enum AdminPermission {
 }
 
 interface User {
-  $id?: string;
-  id?: string;
+  id: string;
   name: string;
   email: string;
-  phone?: string;
-  labels?: string[];
-  role?: string;
+  phone?: string | null;
+  role?: string | null;
   [key: string]: any;
 }
 
 interface AuthStore {
   user: User | null;
-  customer: Customer | null;
   isAdmin: boolean;
   isReadOnly: boolean;
   adminPermission: AdminPermission;
   loading: boolean;
   checkAuth: () => Promise<void>;
   logout: () => Promise<void>;
-  setCustomer: (customer: Customer | null) => void;
   hasWritePermission: () => boolean;
   hasReadPermission: () => boolean;
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
   user: null,
-  customer: null,
   isAdmin: false,
   isReadOnly: false,
   adminPermission: AdminPermission.NONE,
@@ -53,8 +47,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const user = data.user as unknown as User;
       
       // Map Better Auth role or user properties to permissions
-      const hasAdminLabel = user.role === 'admin' || (user.labels && user.labels.includes('admin'));
-      const hasReadOnlyLabel = user.role === 'readonly' || (user.labels && user.labels.includes('readonly'));
+      const hasAdminLabel = user.role === 'admin';
+      const hasReadOnlyLabel = user.role === 'readonly';
       
       let adminPermission = AdminPermission.NONE;
       if (hasAdminLabel) {
@@ -65,7 +59,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       set({ 
         user, 
-        customer: null, // Depending on if customer is still needed or retrieved from DB
         isAdmin: !!hasAdminLabel,
         isReadOnly: !!hasReadOnlyLabel,
         adminPermission,
@@ -74,7 +67,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     } catch (error) {
       set({ 
         user: null, 
-        customer: null, 
         isAdmin: false, 
         isReadOnly: false,
         adminPermission: AdminPermission.NONE,
@@ -89,7 +81,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       
       set({ 
         user: null, 
-        customer: null, 
         isAdmin: false,
         isReadOnly: false,
         adminPermission: AdminPermission.NONE,
@@ -99,10 +90,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     } catch (error) {
       console.error('Error logging out:', error);
     }
-  },
-  
-  setCustomer: (customer: Customer | null) => {
-    set({ customer });
   },
   
   // Utility methods for permission checking

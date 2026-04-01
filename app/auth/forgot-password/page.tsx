@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { account } from '@/lib/appwrite';
+import { authClient } from '@/lib/auth-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,12 +19,17 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     try {
-      // Use Appwrite's built-in password recovery
-      await account.createRecovery({ email: email, url: `${window.location.origin}/auth/reset-password` });
+      // @ts-expect-error - forgetPassword exists on the server but TS inference is missing here
+      const { error } = await authClient.forgetPassword({
+        email,
+        redirectTo: `${window.location.origin}/auth/reset-password`
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
 
       toast.success('Password reset link sent to your email! Please check your inbox.');
-      
-      // Redirect to login page
       router.push('/auth/login');
     } catch (error: any) {
       console.error('Password reset error:', error);
@@ -33,7 +38,6 @@ export default function ForgotPasswordPage() {
       setLoading(false);
     }
   };
-
 
   return (
     <div className="max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-12">
