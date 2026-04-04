@@ -2,11 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/database/config';
 import { courses } from '@/database/schema';
 import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
 import { desc } from 'drizzle-orm';
 
-async function requireAdmin() {
-  const session = await auth.api.getSession({ headers: await headers() });
+async function requireAdmin(request: NextRequest) {
+  const session = await auth.api.getSession({ headers: request.headers });
   if (!session?.user) {
     return null;
   }
@@ -18,9 +17,9 @@ async function requireAdmin() {
 }
 
 // GET /api/admin/courses — list all courses (admin)
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const admin = await requireAdmin();
+    const admin = await requireAdmin(request);
     if (!admin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -36,7 +35,7 @@ export async function GET() {
 // POST /api/admin/courses — create a new course
 export async function POST(request: NextRequest) {
   try {
-    const admin = await requireAdmin();
+    const admin = await requireAdmin(request);
     if (!admin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

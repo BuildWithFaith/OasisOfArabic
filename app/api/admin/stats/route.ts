@@ -1,23 +1,21 @@
-export const dynamic = 'force-dynamic';
-
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse, connection } from 'next/server';
 import { db } from '@/database/config';
 import { courses, enrollments, payments, users } from '@/database/schema';
 import { auth } from '@/lib/auth';
-import { headers } from 'next/headers';
 import { eq, count, sum } from 'drizzle-orm';
 
-async function requireAdmin() {
-  const session = await auth.api.getSession({ headers: await headers() });
+async function requireAdmin(request: NextRequest) {
+  const session = await auth.api.getSession({ headers: request.headers });
   if (!session?.user) return null;
   const user = session.user as { role?: string };
   if (user.role !== 'admin') return null;
   return session.user;
 }
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  await connection(); // opt out of static prerendering
   try {
-    const admin = await requireAdmin();
+    const admin = await requireAdmin(request);
     if (!admin) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

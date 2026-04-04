@@ -1,12 +1,11 @@
-export const dynamic = 'force-dynamic';
-
-import { NextResponse } from 'next/server';
+import { NextResponse, connection } from 'next/server';
 import { db } from '@/database/config';
 import { courses } from '@/database/schema';
 import { eq, asc } from 'drizzle-orm';
 
 // GET /api/courses — public endpoint, returns all active courses
 export async function GET() {
+  await connection(); // opt out of static prerendering
   try {
     const activeCourses = await db
       .select()

@@ -4,11 +4,11 @@ import nodemailer from 'nodemailer';
 // Nodemailer transporter — Hostinger SMTP using founder@OasisOfArabic.com
 // -------------------------------------------------------------------
 const transporter = nodemailer.createTransport({
-  host: 'smtp.hostinger.com',
-  port: 465,
-  secure: true, // SSL
+  host: process.env.SMTP_HOST || 'smtp.hostinger.com',
+  port: parseInt(process.env.SMTP_PORT || '587', 10),
+  secure: process.env.SMTP_PORT === '465', // True if port is 465, else false (for 587)
   auth: {
-    user: 'founder@OasisOfArabic.com',
+    user: process.env.SMTP_USER || 'founder@OasisOfArabic.com',
     pass: process.env.SMTP_PASSWORD || '',
   },
 });
