@@ -1,72 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { sendOrderConfirmation } from '@/lib/email';
+import { sendEnrollmentConfirmation } from '@/lib/email';
 
+// This endpoint has been updated for Oasis of Arabic
+// It now sends enrollment confirmation emails (not rice orders)
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    
-    const {
-      orderId,
-      customerName,
-      customerEmail,
-      customerPhone,
-      deliveryAddress,
-      mapsUrl,
-      items,
-      totalPrice,
-      totalSavings,
-      totalOriginalPrice,
-      loyaltyCode,
-      loyaltyPercent,
-      totalWeight,
-    } = body;
+    const { studentName, studentEmail, courseTitle, coursePrice, currency, zoomLink } = body;
 
-    // Validate required fields
-    if (!orderId || !customerName || !customerEmail || !customerPhone || !deliveryAddress || !items || !totalPrice) {
+    if (!studentName || !studentEmail || !courseTitle || !coursePrice) {
       return NextResponse.json(
-        { error: 'Missing required fields' },
+        { error: 'studentName, studentEmail, courseTitle, and coursePrice are required' },
         { status: 400 }
       );
     }
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(customerEmail)) {
-      return NextResponse.json(
-        { error: 'Invalid email format' },
-        { status: 400 }
-      );
-    }
-
-    // Send email
-    const result = await sendOrderConfirmation({
-      orderId,
-      customerName,
-      customerEmail,
-      customerPhone,
-      deliveryAddress,
-      mapsUrl,
-      items,
-      totalPrice,
-      totalSavings,
-      totalOriginalPrice,
-      loyaltyCode,
-      loyaltyPercent,
-      totalWeight,
+    await sendEnrollmentConfirmation({
+      studentName,
+      studentEmail,
+      courseTitle,
+      coursePrice: Number(coursePrice),
+      currency,
+      zoomLink,
     });
 
-    return NextResponse.json({
-      success: true,
-      message: 'Order confirmation email sent successfully',
-      messageId: result.messageId,
-    });
-  } catch (error) {
-    console.error('Error in send-order-confirmation API:', error);
+    return NextResponse.json({ success: true, message: 'Enrollment confirmation sent' });
+  } catch (error: any) {
+    console.error('Error sending enrollment confirmation:', error);
     return NextResponse.json(
-      { 
-        error: 'Failed to send order confirmation email',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      },
+      { error: error.message || 'Failed to send confirmation email' },
       { status: 500 }
     );
   }

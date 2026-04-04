@@ -10,7 +10,7 @@ import "./globals.css";
 import AnnocementBar from "@/components/annoucement-bar";
 import { Suspense } from "react";
 import { ImageProtection } from "@/components/image-protection";
-import { RamadanPopup } from "@/components/ramadan-popup";
+
 import { Playfair_Display, Poppins } from "next/font/google";
 
 const playfair = Playfair_Display({
@@ -170,9 +170,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <PWAInstall />
         </Suspense>
-        <Suspense fallback={null}>
-          <RamadanPopup />
-        </Suspense>
+
         <ImageProtection />
         <script
           type="application/ld+json"

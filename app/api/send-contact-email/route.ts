@@ -43,8 +43,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Contact form submitted successfully',
-      messageId: result.messageId,
+      message: 'Your message has been sent! We\'ll get back to you soon.',
     });
   } catch (error) {
     console.error('Error in send-contact-email API:', error);
