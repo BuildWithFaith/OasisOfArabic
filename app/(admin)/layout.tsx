@@ -1,7 +1,8 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { useAuthStore, AdminPermission } from '@/lib/store/auth-store';
+import { authClient } from '@/lib/auth-client';
+import { AdminPermission } from '@/lib/store/auth-store';
 import AdminAuthGuard from '@/components/admin/AdminAuthGuard';
 import { Sidebar } from '@/components/admin/Sidebar';
 import { ShieldAlert } from 'lucide-react';
@@ -11,7 +12,9 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const { adminPermission } = useAuthStore();
+  const { data: session } = authClient.useSession();
+  const user = session?.user as any;
+  const adminPermission = user?.role === 'admin' ? AdminPermission.FULL_ACCESS : (user?.role === 'readonly' ? AdminPermission.READ_ONLY : AdminPermission.NONE);
   const isReadOnly = adminPermission === AdminPermission.READ_ONLY;
   
   return (

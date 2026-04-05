@@ -393,8 +393,8 @@ export default function CoursesAdminPage() {
                       </button>
                       <p className="text-xs text-gray-400 mt-1.5">JPEG, PNG, WebP — max 5MB</p>
                       <input
-                        type="url"
-                        placeholder="Or paste image URL"
+                        type="text"
+                        placeholder="Or paste image path/URL"
                         value={form.imageUrl}
                         onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))}
                         className="mt-2 w-full border border-gray-200 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-500"

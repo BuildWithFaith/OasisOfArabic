@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useAuthStore, AdminPermission } from '@/lib/store/auth-store';
+import { authClient } from '@/lib/auth-client';
+import { AdminPermission } from '@/lib/store/auth-store';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ShieldAlert, ShieldCheck, ShieldX } from 'lucide-react';
@@ -16,31 +17,27 @@ interface AdminAuthGuardProps {
 export default function AdminAuthGuard({
   children,
   requiredPermission = AdminPermission.READ_ONLY, // Default to read-only permission
-  redirectPath = '/'
+  redirectPath = '/auth/login'
 }: AdminAuthGuardProps) {
   const router = useRouter();
-  const { 
-    adminPermission, 
-    loading: authLoading, 
-    checkAuth,
-    hasReadPermission,
-    hasWritePermission
-  } = useAuthStore();
+  const { data: session, isPending: authLoading } = authClient.useSession();
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
+  const user = session?.user as any;
+  const adminPermission = user?.role === 'admin' ? AdminPermission.FULL_ACCESS : (user?.role === 'readonly' ? AdminPermission.READ_ONLY : AdminPermission.NONE);
 
   useEffect(() => {
     if (!authLoading) {
       let authorized = false;
       
+      const hasWritePermission = adminPermission === AdminPermission.FULL_ACCESS;
+      const hasReadPermission = adminPermission !== AdminPermission.NONE;
+
       if (requiredPermission === AdminPermission.FULL_ACCESS) {
-        authorized = hasWritePermission();
+        authorized = hasWritePermission;
       } else if (requiredPermission === AdminPermission.READ_ONLY) {
-        authorized = hasReadPermission();
+        authorized = hasReadPermission;
       }
       
       setIsAuthorized(authorized);
@@ -56,7 +53,7 @@ export default function AdminAuthGuard({
         return () => clearTimeout(timer);
       }
     }
-  }, [authLoading, adminPermission, requiredPermission, redirectPath, router, hasReadPermission, hasWritePermission]);
+  }, [authLoading, adminPermission, requiredPermission, redirectPath, router]);
 
   if (isLoading || authLoading) {
     return (
@@ -85,8 +82,8 @@ export default function AdminAuthGuard({
               ? "You need full admin access to view this page."
               : "You need at least read-only access to view this page."}
           </p>
-          <Button onClick={() => router.push('/')} variant="outline" className="mx-auto">
-            Return to Home
+          <Button onClick={() => router.push(redirectPath)} variant="outline" className="mx-auto">
+            Go to Login
           </Button>
         </Card>
       </div>

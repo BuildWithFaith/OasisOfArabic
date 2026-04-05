@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { authClient } from '@/lib/auth-client';
-import { useAuthStore } from '@/lib/store/auth-store';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,7 +12,6 @@ import toast from 'react-hot-toast';
 export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const checkAuth = useAuthStore((state) => state.checkAuth);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -36,7 +34,6 @@ export default function LoginForm() {
         throw new Error(error.message || 'Failed to login');
       }
 
-      await checkAuth();
       toast.success('Logged in successfully!');
 
       const redirectTo = searchParams.get('redirect') || '/';

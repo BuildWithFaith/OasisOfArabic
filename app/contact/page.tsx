@@ -6,11 +6,12 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import toast from "react-hot-toast";
 import { Mail, Phone, Globe, Send, Lock } from "lucide-react";
-import { useAuthStore } from "@/lib/store/auth-store";
+import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
 
 export default function ContactPage() {
-  const { user } = useAuthStore();
+  const { data: session } = authClient.useSession();
+  const user = session?.user as any;
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     subject: "",

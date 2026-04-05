@@ -2,34 +2,34 @@ import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { db } from "../database/config";
 import * as schema from "../database/schema";
-import { sendPasswordResetLink, sendVerificationOTP, generateOTP } from "./email";
+import { sendPasswordResetLink } from "./email";
 
 export const auth = betterAuth({
+    baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
     database: drizzleAdapter(db, {
         provider: "pg",
-        schema,
+        schema: {
+            user: schema.users,
+            session: schema.sessions,
+            account: schema.accounts,
+            verification: schema.verifications,
+        },
     }),
-    // Allow both www and non-www so CORS preflight succeeds regardless of which
-    // variant the browser lands on. The canonical redirect in next.config.ts
-    // will eventually unify traffic, but trustedOrigins prevents hard failures.
+    // Allow both www and non-www (production) and localhost (development).
     trustedOrigins: [
         "https://oasisofarabic.com",
         "https://www.oasisofarabic.com",
+        "http://localhost:3000",
     ],
     emailAndPassword: {
         enabled: true,
-        requireEmailVerification: false, // allow login without verification first
+        requireEmailVerification: false, // allow login without email verification
         sendResetPassword: async ({ user, url }) => {
-            await sendPasswordResetLink(user.email, url, user.name);
-        },
-    },
-    emailVerification: {
-        sendOnSignUp: false, // We handle OTP manually via /api/auth/send-verification-otp
-        sendVerificationEmail: async ({ user, url }) => {
-            // Better Auth sends a link-based verification — use sendPasswordResetLink pattern
-            // For OTP flow, we use our own /api/auth/send-verification-otp endpoint instead
-            const otp = generateOTP();
-            await sendVerificationOTP(user.email, otp, user.name);
+            try {
+                await sendPasswordResetLink(user.email, url, user.name);
+            } catch (err) {
+                console.error("[Auth] Failed to send password reset email:", err);
+            }
         },
     },
     session: {
@@ -46,3 +46,4 @@ export const auth = betterAuth({
         },
     },
 });
+

@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { useAuthStore } from '@/lib/store/auth-store';
+import { authClient } from '@/lib/auth-client';
+import { AdminPermission } from '@/lib/store/auth-store';
 import { Tooltip } from '../ui/tooltip';
 import { LockIcon } from 'lucide-react';
 
@@ -22,10 +23,13 @@ export default function ReadOnlyGuard({
   showTooltip = true,
   tooltipText = "Read-only access: You can view but not modify content"
 }: ReadOnlyGuardProps) {
-  const { hasWritePermission } = useAuthStore();
+  const { data: session } = authClient.useSession();
+  const user = session?.user as any;
+  const adminPermission = user?.role === 'admin' ? AdminPermission.FULL_ACCESS : (user?.role === 'readonly' ? AdminPermission.READ_ONLY : AdminPermission.NONE);
+  const hasWritePermission = adminPermission === AdminPermission.FULL_ACCESS;
   
   // If user has write permission, render children normally
-  if (hasWritePermission()) {
+  if (hasWritePermission) {
     return <>{children}</>;
   }
   

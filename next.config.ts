@@ -5,32 +5,6 @@ const nextConfig: NextConfig = {
   // Next.js 16 Advanced Features
   // ============================================
   reactCompiler: true,
-  // Enable Cache Components with PPR (Partial Prerendering)
-  // This enables the new caching model with 'use cache' directive
-  // But disable it for API routes to avoid build-time authentication issues
-  cacheComponents: true,
-
-  // Configure cache profiles for optimal performance
-  cacheLife: {
-    // Default profile for most content
-    default: {
-      stale: 3600, // 1 hour stale time
-      revalidate: 86400, // 24 hours revalidation
-      expire: 604800, // 7 days expiration
-    },
-    // For frequently changing content
-    frequent: {
-      stale: 300, // 5 minutes
-      revalidate: 900, // 15 minutes
-      expire: 3600, // 1 hour
-    },
-    // For static content that rarely changes
-    max: {
-      stale: 86400, // 24 hours
-      revalidate: 604800, // 7 days
-      expire: 2592000, // 30 days
-    },
-  },
 
   // ============================================
   // Image Optimization
@@ -119,7 +93,9 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: "Access-Control-Allow-Origin",
-            value: "https://www.oasisofarabic.com",
+            value: process.env.NODE_ENV === "production"
+              ? "https://www.oasisofarabic.com"
+              : "http://localhost:3000",
           },
           {
             key: "Access-Control-Allow-Methods",

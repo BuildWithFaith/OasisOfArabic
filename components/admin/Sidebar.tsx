@@ -3,21 +3,22 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { useAuthStore } from '@/lib/store/auth-store';
+import { authClient } from '@/lib/auth-client';
+import { AdminPermission } from '@/lib/store/auth-store';
 import { 
   LayoutDashboard, 
-  Package, 
-  ShoppingBag, 
-  Users,
-  UserSearchIcon,
   LogOut, 
   ShieldCheck,
-  Home
+  Home,
+  BookOpen,
+  GraduationCap
 } from 'lucide-react';
 
 export function Sidebar() {
   const pathname = usePathname();
-  const { adminPermission, logout } = useAuthStore();
+  const { data: session } = authClient.useSession();
+  const user = session?.user as any;
+  const adminPermission = user?.role === 'admin' ? AdminPermission.FULL_ACCESS : (user?.role === 'readonly' ? AdminPermission.READ_ONLY : AdminPermission.NONE);
   
   const isActive = (path: string) => {
     return pathname === path || pathname.startsWith(`${path}/`);
@@ -30,29 +31,19 @@ export function Sidebar() {
       icon: LayoutDashboard,
     },
     {
-      name: 'Products',
-      href: '/admin/products',
-      icon: Package,
+      name: 'Courses',
+      href: '/admin/courses',
+      icon: BookOpen,
     },
     {
-      name: 'Orders',
-      href: '/admin/orders',
-      icon: ShoppingBag,
+      name: 'Enrollments',
+      href: '/admin/enrollments',
+      icon: GraduationCap,
     },
-    {
-      name: 'Customers',
-      href: '/admin/customers',
-      icon: Users,
-    },  
     {
       name: 'Auth Test',
       href: '/admin/test',
       icon: ShieldCheck,
-    },
-    {
-      name: 'Staff Performance',
-      href: '/admin/staff-performance',
-      icon: UserSearchIcon,
     },
   ];
 
@@ -66,9 +57,9 @@ export function Sidebar() {
         <div className="mt-2">
           <span className={cn(
             "text-xs font-medium px-2 py-1 rounded-full",
-            adminPermission === 'admin' ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
+            adminPermission === AdminPermission.FULL_ACCESS ? "bg-green-100 text-green-800" : "bg-blue-100 text-blue-800"
           )}>
-            {adminPermission === 'admin' ? 'Full Access' : 'Read Only'}
+            {adminPermission === AdminPermission.FULL_ACCESS ? 'Full Access' : 'Read Only'}
           </span>
         </div>
       </div>
@@ -100,7 +91,10 @@ export function Sidebar() {
           Back to Site
         </Link>
         <button
-          onClick={() => logout()}
+          onClick={async () => {
+            await authClient.signOut();
+            window.location.href = '/';
+          }}
           className="flex items-center w-full px-3 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50"
         >
           <LogOut className="w-5 h-5 mr-3" />

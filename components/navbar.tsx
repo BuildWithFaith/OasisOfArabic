@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { User, LogOut, ChevronDown } from "lucide-react";
+import { User, LogOut, ChevronDown, LayoutDashboard } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useEffect, useState, useRef } from "react";
 import {
@@ -18,8 +18,8 @@ import {
 
 export function Navbar() {
   const { data: session } = authClient.useSession();
-  const user = session?.user;
-  const isAdmin = false; // Add custom logic if needed later
+  const user = session?.user as any;
+  const isAdmin = user?.role === 'admin' || user?.role === 'readonly';
   
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
@@ -98,10 +98,20 @@ export function Navbar() {
               {/* Dropdown Menu */}
               {isProfileDropdownOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-neutral-900 rounded-lg shadow-lg border border-gray-200 dark:border-neutral-800 z-50">
+                  {isAdmin && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setIsProfileDropdownOpen(false)}
+                      className="flex items-center space-x-2 px-4 py-3 text-black dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800 transition first:rounded-t-lg"
+                    >
+                      <LayoutDashboard className="w-4 h-4" />
+                      <span>Admin Dashboard</span>
+                    </Link>
+                  )}
                   <Link
                     href="/profile"
                     onClick={() => setIsProfileDropdownOpen(false)}
-                    className="flex items-center space-x-2 px-4 py-3 text-black dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800 transition first:rounded-t-lg"
+                    className={`flex items-center space-x-2 px-4 py-3 text-black dark:text-neutral-300 hover:bg-gray-50 dark:hover:bg-neutral-800 transition ${!isAdmin ? 'first:rounded-t-lg' : ''}`}
                   >
                     <User className="w-4 h-4" />
                     <span>My Learning</span>
@@ -178,6 +188,16 @@ export function Navbar() {
               <span className="text-sm text-black dark:text-neutral-300 font-medium">
                 {user.name || user.email}
               </span>
+              {isAdmin && (
+                <Link
+                  href="/admin"
+                  onClick={handleMobileItemClick}
+                  className="flex items-center space-x-2 text-black dark:text-neutral-300 hover:text-primary dark:hover:text-white"
+                >
+                  <LayoutDashboard className="w-4 h-4" />
+                  <span>Admin Dashboard</span>
+                </Link>
+              )}
               <Link
                 href="/profile"
                 onClick={handleMobileItemClick}

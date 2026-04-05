@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAuthStore, AdminPermission } from '@/lib/store/auth-store';
+import { useState } from 'react';
+import { AdminPermission } from '@/lib/store/auth-store';
+import { authClient } from '@/lib/auth-client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import AdminAuthGuard from '@/components/admin/AdminAuthGuard';
@@ -9,7 +10,12 @@ import ReadOnlyGuard from '@/components/admin/ReadOnlyGuard';
 import { ShieldCheck, ShieldAlert, ShieldX, User } from 'lucide-react';
 
 export default function AdminTestPage() {
-  const { user, adminPermission, hasReadPermission, hasWritePermission } = useAuthStore();
+  const { data: session } = authClient.useSession();
+  const user = session?.user as any;
+  const adminPermission = user?.role === 'admin' ? AdminPermission.FULL_ACCESS : (user?.role === 'readonly' ? AdminPermission.READ_ONLY : AdminPermission.NONE);
+  const hasWritePermission = () => adminPermission === AdminPermission.FULL_ACCESS;
+  const hasReadPermission = () => adminPermission !== AdminPermission.NONE;
+  
   const [apiData, setApiData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
 
@@ -50,20 +56,20 @@ export default function AdminTestPage() {
                   <p className="font-medium">{user?.email || 'N/A'}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Labels</p>
+                  <p className="text-sm text-gray-500">Role</p>
                   <div className="flex flex-wrap gap-2 mt-1">
-                    {user?.labels?.map((label: string) => (
+                    {user?.role ? (
                       <span
-                        key={label}
-                        className={`px-2 py-1 text-xs font-medium rounded-full ${label === 'admin' ? 'bg-green-100 text-green-800' :
-                            label === 'readonly' ? 'bg-blue-100 text-blue-800' :
+                        className={`px-2 py-1 text-xs font-medium rounded-full ${user.role === 'admin' ? 'bg-green-100 text-green-800' :
+                            user.role === 'readonly' ? 'bg-blue-100 text-blue-800' :
                               'bg-gray-100 text-gray-800'
                           }`}
                       >
-                        {label}
+                        {user.role}
                       </span>
-                    ))}
-                    {!user?.labels?.length && <span className="text-gray-500">No labels</span>}
+                    ) : (
+                      <span className="text-gray-500">No role</span>
+                    )}
                   </div>
                 </div>
               </div>

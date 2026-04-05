@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Course } from "@/lib/types";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import toast from "react-hot-toast";
 import { Loader2, CreditCard } from "lucide-react";
 
@@ -66,10 +67,11 @@ export default function CheckoutForm({ course }: { course: Course }) {
       {!session ? (
         <div className="bg-slate-950 border border-slate-800 rounded-xl p-6 text-center">
           <p className="text-slate-400 mb-4">Please log in to enroll in this course.</p>
-          {/* We'd have a login component or redirect here */}
-          <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-medium transition-colors">
-            Log In
-          </button>
+          <Link href={`/auth/login?redirect=/checkout?course=${course.id}`}>
+            <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-medium transition-colors">
+              Log In directly
+            </button>
+          </Link>
         </div>
       ) : (
         <form onSubmit={handleEnroll} className="space-y-6">

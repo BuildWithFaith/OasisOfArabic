@@ -2,20 +2,26 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/lib/store/auth-store";
+import { authClient } from "@/lib/auth-client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, BookOpen } from "lucide-react";
 import Link from "next/link";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { data: session, isPending } = authClient.useSession();
+  const user = session?.user;
 
   useEffect(() => {
-    if (!user) {
+    if (!isPending && !user) {
       router.push("/auth/login");
     }
-  }, [user, router]);
+  }, [user, isPending, router]);
+
+  // Show nothing while session is loading to avoid flash-redirect
+  if (isPending) {
+    return null;
+  }
 
   if (!user) {
     return null;

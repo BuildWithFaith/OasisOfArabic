@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
-import { useAuthStore } from "@/lib/store/auth-store";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +11,6 @@ import toast from "react-hot-toast";
 
 export default function RegisterForm() {
   const router = useRouter();
-  const checkAuth = useAuthStore((state) => state.checkAuth);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -44,10 +42,9 @@ export default function RegisterForm() {
       });
 
       if (error) {
+        console.error("Registration error detail:", JSON.stringify(error, null, 2));
         throw new Error(error.message || "Failed to create account");
       }
-
-      await checkAuth();
 
       toast.success("Account created successfully!");
       router.push("/");
