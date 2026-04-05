@@ -104,7 +104,7 @@ export function PWAInstall() {
           <div className="flex items-center justify-between p-4 max-w-lg mx-auto">
             <div className="flex-1 mr-4">
               <h3 className="font-bold text-[#27247b] text-sm mb-1">
-                Install Yousuf Rice App
+                Install Oasis of Arabic App
               </h3>
               <p className="text-xs text-gray-500">
                 Get the best experience with our native app.

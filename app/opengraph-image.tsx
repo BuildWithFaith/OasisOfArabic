@@ -1,7 +1,7 @@
 import { ImageResponse } from 'next/og';
 
 // Image metadata
-export const alt = 'Yousuf Rice - Premium Quality Rice Delivery';
+export const alt = 'Oasis of Arabic - Master Arabic Online';
 export const size = {
   width: 1200,
   height: 630,
@@ -15,7 +15,7 @@ export default async function Image() {
     (
       <div
         style={{
-          background: 'linear-gradient(135deg, #27247b 0%, #1a1854 100%)',
+          background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -34,7 +34,7 @@ export default async function Image() {
             left: '-100px',
             width: '400px',
             height: '400px',
-            background: '#ffff03',
+            background: '#ffffff',
             borderRadius: '50%',
             opacity: 0.1,
             display: 'flex',
@@ -47,7 +47,7 @@ export default async function Image() {
             right: '-100px',
             width: '400px',
             height: '400px',
-            background: '#ffff03',
+            background: '#ffffff',
             borderRadius: '50%',
             opacity: 0.1,
             display: 'flex',
@@ -74,13 +74,13 @@ export default async function Image() {
               letterSpacing: '-2px',
             }}
           >
-            Yousuf Rice
+            Oasis of Arabic
           </h1>
           <div
             style={{
               width: '200px',
               height: '6px',
-              background: '#ffff03',
+              background: '#ffffff',
               borderRadius: '3px',
               margin: '0 0 40px 0',
               display: 'flex',
@@ -94,7 +94,7 @@ export default async function Image() {
               fontWeight: '300',
             }}
           >
-            Premium Quality Rice Delivery
+            Master Arabic Online
           </p>
           <p
             style={{
@@ -103,7 +103,7 @@ export default async function Image() {
               margin: 0,
             }}
           >
-            Order More, Save More • Free Delivery • Cash on Delivery
+            Premium Courses • Live Zoom Classes • Arabic Grammar
           </p>
         </div>
 
