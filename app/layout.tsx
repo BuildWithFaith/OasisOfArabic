@@ -10,6 +10,7 @@ import "./globals.css";
 import AnnocementBar from "@/components/annoucement-bar";
 import { Suspense } from "react";
 import { ImageProtection } from "@/components/image-protection";
+import { CartDrawer } from "@/components/cart-drawer";
 
 import { Playfair_Display, Poppins } from "next/font/google";
 
@@ -172,6 +173,7 @@ export default function RootLayout({
         </Suspense>
 
         <ImageProtection />
+        <CartDrawer />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

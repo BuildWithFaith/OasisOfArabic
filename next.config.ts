@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   // Next.js 16 Advanced Features
   // ============================================
   reactCompiler: true,
+  cacheComponents: true,
 
   // ============================================
   // Image Optimization

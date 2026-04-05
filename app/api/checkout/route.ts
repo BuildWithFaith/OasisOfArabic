@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPayfastToken, initiatePayfastTransaction } from "@/lib/payfast";
 import { db } from "@/database/config";
 import { courses, enrollments, payments } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { auth } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
@@ -15,32 +15,38 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized. Please log in to enroll." }, { status: 401 });
     }
 
-    const { courseId, amount, customer } = await req.json();
+    const { courseIds, amount, customer } = await req.json();
 
-    if (!courseId) {
-       return NextResponse.json({ error: "Missing courseId" }, { status: 400 });
+    if (!courseIds || !Array.isArray(courseIds) || courseIds.length === 0) {
+       return NextResponse.json({ error: "Missing or invalid courseIds" }, { status: 400 });
     }
 
-    // 1. Verify Course exists
-    const courseRes = await db.select().from(courses).where(eq(courses.id, courseId)).limit(1);
-    const course = courseRes[0];
-    if (!course) {
-      return NextResponse.json({ error: "Course not found" }, { status: 404 });
+    // 1. Verify all Courses exist
+    const courseRes = await db.select().from(courses).where(inArray(courses.id, courseIds));
+    if (courseRes.length !== courseIds.length) {
+      return NextResponse.json({ error: "One or more courses not found" }, { status: 404 });
     }
 
-    // 2. Create Enrollment Record
-    const newEnrollment = await db.insert(enrollments).values({
-      userId: session.user.id,
-      courseId: course.id,
-      status: 'pending' // active after payment success
-    }).returning();
+    const totalAmount = courseRes.reduce((sum, c) => sum + c.price, 0);
 
-    // 3. Create Payment Record
+    // 2. Create Enrollment Records for all courses
+    const enrollmentPromises = courseRes.map(course => 
+      db.insert(enrollments).values({
+        userId: session.user.id,
+        courseId: course.id,
+        status: 'pending'
+      }).returning()
+    );
+    
+    const newEnrollments = await Promise.all(enrollmentPromises);
+
+    // 3. Create a single Payment Record for the total amount
+    // Linked to the first enrollment for now (schema limitation)
     const newPayment = await db.insert(payments).values({
-      enrollmentId: newEnrollment[0].id,
+      enrollmentId: newEnrollments[0][0].id,
       userId: session.user.id,
-      amount: course.price,
-      currency: course.currency,
+      amount: totalAmount,
+      currency: courseRes[0].currency,
       status: 'pending'
     }).returning();
 
@@ -50,13 +56,13 @@ export async function POST(req: NextRequest) {
     const customerIp = req.headers.get("x-forwarded-for")?.split(",")[0] ?? "127.0.0.1";
 
     // 4. Get auth token for PayFast
-    const token = await getPayfastToken(customerIp, paymentId, course.price);
+    const token = await getPayfastToken(customerIp, paymentId, totalAmount);
 
     // 5. Initiate transaction
     const result = await initiatePayfastTransaction({
       token,
       orderId: paymentId,
-      amount: course.price,
+      amount: totalAmount,
       customerName: session.user.name,
       customerEmail: session.user.email,
       customerPhone: customer?.phone || '00000000000',

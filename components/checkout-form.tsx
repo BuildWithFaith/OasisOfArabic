@@ -8,7 +8,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import { Loader2, CreditCard } from "lucide-react";
 
-export default function CheckoutForm({ course }: { course: Course }) {
+export default function CheckoutForm({ courses, totalPrice }: { courses: Course[], totalPrice: number }) {
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
   const [loading, setLoading] = useState(false);
@@ -18,7 +18,6 @@ export default function CheckoutForm({ course }: { course: Course }) {
     e.preventDefault();
     if (!session) {
       toast.error("You must be logged in to enroll.");
-      // Could redirect to login here
       return;
     }
 
@@ -33,8 +32,8 @@ export default function CheckoutForm({ course }: { course: Course }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          courseId: course.id,
-          amount: course.price,
+          courseIds: courses.map(c => c.id),
+          amount: totalPrice,
           customer: {
             phone,
           }
@@ -67,7 +66,7 @@ export default function CheckoutForm({ course }: { course: Course }) {
       {!session ? (
         <div className="bg-slate-950 border border-slate-800 rounded-xl p-6 text-center">
           <p className="text-slate-400 mb-4">Please log in to enroll in this course.</p>
-          <Link href={`/auth/login?redirect=/checkout?course=${course.id}`}>
+          <Link href={`/auth/login?redirect=/checkout`}>
             <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-2 rounded-lg font-medium transition-colors">
               Log In directly
             </button>
@@ -121,7 +120,7 @@ export default function CheckoutForm({ course }: { course: Course }) {
               ) : (
                 <>
                   <CreditCard className="w-5 h-5 mr-2" />
-                  Pay {course.currency} {course.price}
+                  Pay {courses[0]?.currency} {totalPrice.toFixed(2)}
                 </>
               )}
             </button>

@@ -1,8 +1,13 @@
+"use client";
+
 import Link from 'next/link';
 import { Course } from '@/lib/types';
-import { Clock, MonitorPlay, FileText } from 'lucide-react';
+import { Clock, MonitorPlay, FileText, ShoppingCart, ArrowRight } from 'lucide-react';
+import { useCartStore } from '@/lib/store/cart-store';
 
 export default function CourseCard({ course }: { course: Course }) {
+  const { addItem } = useCartStore();
+
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden hover:shadow-xl hover:shadow-primary/10 transition-all duration-300 group">
       <div className="relative h-48 bg-secondary overflow-hidden">
@@ -44,12 +49,22 @@ export default function CourseCard({ course }: { course: Course }) {
           </div>
         </div>
         
-        <Link 
-          href={`/checkout?courseId=${course.id}`}
-          className="block w-full text-center bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 px-4 rounded-lg transition-colors shadow-sm"
-        >
-          Enroll Now
-        </Link>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button 
+            onClick={() => addItem(course)}
+            className="flex-1 flex items-center justify-center gap-2 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-bold py-3 px-4 rounded-lg transition-colors shadow-sm"
+          >
+            <ShoppingCart className="w-4 h-4" />
+            Add to Cart
+          </button>
+          <Link 
+            href={`/checkout?course=${course.id}`}
+            className="flex-1 flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-3 px-4 rounded-lg transition-colors shadow-sm"
+          >
+            Enroll Now
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
       </div>
     </div>
   );

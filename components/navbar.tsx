@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { User, LogOut, ChevronDown, LayoutDashboard } from "lucide-react";
+import { User, LogOut, ChevronDown, LayoutDashboard, ShoppingCart } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { useCartStore } from "@/lib/store/cart-store";
 import { useEffect, useState, useRef } from "react";
 import {
   Navbar as AceternityNavbar,
@@ -18,6 +19,7 @@ import {
 
 export function Navbar() {
   const { data: session } = authClient.useSession();
+  const { items, toggleCart } = useCartStore();
   const user = session?.user as any;
   const isAdmin = user?.role === 'admin' || user?.role === 'readonly';
   
@@ -79,7 +81,19 @@ export function Navbar() {
         <NavItems items={navItems} />
 
         {/* Right Side Actions */}
-        <div className="relative z-20 flex items-center space-x-2">
+        <div className="relative z-20 flex items-center space-x-4">
+          {/* Cart Button */}
+          <button 
+            onClick={toggleCart}
+            className="group relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 transition text-black dark:text-neutral-300"
+          >
+            <ShoppingCart className="w-5 h-5 group-hover:scale-110 transition-transform" />
+            {items.length > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 bg-emerald-600 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center animate-in zoom-in-50">
+                {items.length}
+              </span>
+            )}
+          </button>
 
           {/* Auth Section */}
           {user ? (
@@ -156,7 +170,19 @@ export function Navbar() {
           </Link>
 
           {/* Right Side Actions */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-4">
+            {/* Cart Button (Mobile) */}
+            <button 
+              onClick={toggleCart}
+              className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-neutral-800 transition text-black dark:text-neutral-300"
+            >
+              <ShoppingCart className="w-6 h-6" />
+              {items.length > 0 && (
+                <span className="absolute top-1 right-1 bg-emerald-600 text-white text-[10px] font-bold h-4 w-4 rounded-full flex items-center justify-center">
+                  {items.length}
+                </span>
+              )}
+            </button>
 
             {/* Mobile Menu Toggle */}
             <MobileNavToggle
