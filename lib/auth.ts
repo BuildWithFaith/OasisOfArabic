@@ -9,6 +9,13 @@ export const auth = betterAuth({
         provider: "pg",
         schema,
     }),
+    // Allow both www and non-www so CORS preflight succeeds regardless of which
+    // variant the browser lands on. The canonical redirect in next.config.ts
+    // will eventually unify traffic, but trustedOrigins prevents hard failures.
+    trustedOrigins: [
+        "https://oasisofarabic.com",
+        "https://www.oasisofarabic.com",
+    ],
     emailAndPassword: {
         enabled: true,
         requireEmailVerification: false, // allow login without verification first

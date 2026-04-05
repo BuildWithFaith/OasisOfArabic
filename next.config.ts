@@ -74,6 +74,20 @@ const nextConfig: NextConfig = {
   // It provides 5-10x faster builds and hot module replacement
 
   // ============================================
+  // Canonical Redirect (www → non-www)
+  // ============================================
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.oasisofarabic.com" }],
+        destination: "https://oasisofarabic.com/:path*",
+        permanent: true,
+      },
+    ];
+  },
+
+  // ============================================
   // Headers for SEO and Security
   // ============================================
   async headers() {
@@ -112,6 +126,31 @@ const nextConfig: NextConfig = {
         ],
       },
       {
+        // CORS headers for auth API — required because the auth client may
+        // be served from a different subdomain (www vs non-www) during
+        // the brief window before the canonical redirect kicks in.
+        source: "/api/auth/:path*",
+        headers: [
+          {
+            key: "Access-Control-Allow-Origin",
+            value: "https://www.oasisofarabic.com",
+          },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET, POST, PUT, DELETE, OPTIONS",
+          },
+          {
+            key: "Access-Control-Allow-Headers",
+            value: "Content-Type, Authorization, X-Requested-With",
+          },
+          {
+            key: "Access-Control-Allow-Credentials",
+            value: "true",
+          },
+        ],
+      },
+      {
+
         // Cache static assets aggressively
         source: "/static/:path*",
         headers: [
