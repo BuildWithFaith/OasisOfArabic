@@ -25,7 +25,7 @@ export default async function CheckoutPage({
   // Priority 1: Direct course ID from URL
   if (courseId) {
     const courseList = await db.select().from(courses).where(eq(courses.id, courseId)).limit(1);
-    if (courseList.length > 0) {
+    if (courseList.length > 0 && courseList[0].isActive) {
       selectedCourses = [courseList[0] as Course];
     }
   } 
@@ -37,7 +37,8 @@ export default async function CheckoutPage({
         const cartItems = JSON.parse(cartCookie.value) as Course[];
         const ids = cartItems.map(item => item.id);
         if (ids.length > 0) {
-          selectedCourses = await db.select().from(courses).where(inArray(courses.id, ids));
+          const results = await db.select().from(courses).where(inArray(courses.id, ids));
+          selectedCourses = results.filter(c => c.isActive);
         }
       } catch (e) {
         console.error("Failed to parse cart cookie", e);

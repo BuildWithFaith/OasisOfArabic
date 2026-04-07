@@ -3,6 +3,7 @@ import { db } from '@/database/config';
 import { courses } from '@/database/schema';
 import { auth } from '@/lib/auth';
 import { desc } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
 
 async function requireAdmin(request: NextRequest) {
   const session = await auth.api.getSession({ headers: request.headers });
@@ -78,6 +79,10 @@ export async function POST(request: NextRequest) {
         imageUrl: imageUrl || null,
       })
       .returning();
+
+    revalidatePath('/');
+    revalidatePath('/courses');
+    revalidatePath('/admin/courses');
 
     return NextResponse.json({ course: newCourse }, { status: 201 });
   } catch (error: any) {

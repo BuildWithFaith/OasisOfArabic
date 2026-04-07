@@ -4,6 +4,9 @@ import { courses } from '@/database/schema';
 import { auth } from '@/lib/auth';
 import { headers } from 'next/headers';
 import { eq } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
+import { unlink } from 'fs/promises';
+import path from 'path';
 
 async function requireAdmin() {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -11,6 +14,18 @@ async function requireAdmin() {
   const user = session.user as { role?: string };
   if (user.role !== 'admin') return null;
   return session.user;
+}
+
+async function deleteLocalImage(imageUrl?: string | null) {
+  if (!imageUrl) return;
+  if (!imageUrl.startsWith('/uploads/')) return;
+  
+  try {
+    const filePath = path.join(process.cwd(), 'public', imageUrl);
+    await unlink(filePath);
+  } catch (error) {
+    console.error(`Failed to delete old image ${imageUrl}:`, error);
+  }
 }
 
 type RouteContext = { params: Promise<{ id: string }> };
@@ -56,15 +71,30 @@ export async function PUT(request: NextRequest, context: RouteContext) {
     if (materialsUrl !== undefined) updateData.materialsUrl = materialsUrl;
     if (imageUrl !== undefined) updateData.imageUrl = imageUrl;
 
+    // Retrieve existing course to check if image was replaced
+    const [existingCourse] = await db
+      .select()
+      .from(courses)
+      .where(eq(courses.id, id));
+
+    if (!existingCourse) {
+      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+    }
+
     const [updated] = await db
       .update(courses)
       .set(updateData)
       .where(eq(courses.id, id))
       .returning();
 
-    if (!updated) {
-      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+    // If updating imageUrl and it changed, delete the old image
+    if (imageUrl !== undefined && existingCourse.imageUrl && existingCourse.imageUrl !== imageUrl) {
+      await deleteLocalImage(existingCourse.imageUrl);
     }
+
+    revalidatePath('/');
+    revalidatePath('/courses');
+    revalidatePath('/admin/courses');
 
     return NextResponse.json({ course: updated });
   } catch (error: any) {
@@ -83,14 +113,28 @@ export async function DELETE(request: NextRequest, context: RouteContext) {
 
     const { id } = await context.params;
 
+    // Retrieve existing course to get image url before deletion
+    const [existingCourse] = await db
+      .select()
+      .from(courses)
+      .where(eq(courses.id, id));
+
+    if (!existingCourse) {
+      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+    }
+
     const [deleted] = await db
       .delete(courses)
       .where(eq(courses.id, id))
       .returning();
 
-    if (!deleted) {
-      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+    if (existingCourse.imageUrl) {
+      await deleteLocalImage(existingCourse.imageUrl);
     }
+
+    revalidatePath('/');
+    revalidatePath('/courses');
+    revalidatePath('/admin/courses');
 
     return NextResponse.json({ success: true, deleted });
   } catch (error: any) {

@@ -75,6 +75,7 @@ export default function CoursesAdminPage() {
   const [deleting, setDeleting] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [filter, setFilter] = useState<'available' | 'unavailable'>('available');
   const fileRef = useRef<HTMLInputElement>(null);
 
   // ─── Fetch Courses ──────────────────────────────────────────────
@@ -204,6 +205,8 @@ export default function CoursesAdminPage() {
   }
 
   // ─── Render ──────────────────────────────────────────────────────
+  const displayedCourses = courses.filter((c) => filter === 'available' ? c.isActive : !c.isActive);
+
   return (
     <AdminAuthGuard>
       <div className="min-h-screen bg-gradient-to-br from-green-50 to-white">
@@ -228,6 +231,30 @@ export default function CoursesAdminPage() {
             </button>
           </div>
 
+          {/* Tabs */}
+          <div className="flex gap-4 mb-8">
+            <button
+              onClick={() => setFilter('available')}
+              className={`px-6 py-2.5 rounded-xl font-semibold transition-colors ${
+                filter === 'available'
+                  ? 'bg-green-600 text-white shadow-sm'
+                  : 'bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900 border border-gray-200'
+              }`}
+            >
+              Available Courses
+            </button>
+            <button
+              onClick={() => setFilter('unavailable')}
+              className={`px-6 py-2.5 rounded-xl font-semibold transition-colors ${
+                filter === 'unavailable'
+                  ? 'bg-gray-800 text-white shadow-sm'
+                  : 'bg-white text-gray-600 hover:bg-gray-50 hover:text-gray-900 border border-gray-200'
+              }`}
+            >
+              Unavailable Courses
+            </button>
+          </div>
+
           {/* Course Cards Grid */}
           {loading ? (
             <div className="flex items-center justify-center py-24">
@@ -247,9 +274,19 @@ export default function CoursesAdminPage() {
                 Create First Course
               </button>
             </div>
+          ) : displayedCourses.length === 0 ? (
+            <div className="text-center py-24 bg-white rounded-2xl border border-gray-100 shadow-sm">
+              <BookOpen className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                No {filter} courses
+              </h3>
+              <p className="text-gray-400">
+                You don't have any {filter} courses at the moment.
+              </p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {courses.map((course) => (
+              {displayedCourses.map((course) => (
                 <div
                   key={course.id}
                   className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow group"
