@@ -1,11 +1,11 @@
-import { CourseService } from '@/lib/services/course-service';
+import { getActiveCourses } from '@/app/data/courses';
 import CourseCard from '@/components/course-card';
 import { Suspense } from 'react';
 import Link from 'next/link';
 import { GraduationCap, Video, Users } from 'lucide-react';
 
 export default async function Home() {
-  const courses = await CourseService.getAllCourses();
+  const courses = await getActiveCourses();
 
   return (
     <div className="min-h-screen bg-background text-foreground font-sans selection:bg-primary/30 overflow-hidden">

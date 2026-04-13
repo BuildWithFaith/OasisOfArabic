@@ -29,7 +29,8 @@ interface Course {
   zoomJoinLink: string | null;
   materialsUrl: string | null;
   imageUrl: string | null;
-  createdAt: string;
+  createdAt: string | Date;
+  updatedAt?: string | Date;
 }
 
 const features = [
@@ -111,20 +112,10 @@ function CourseCard({ course }: { course: Course }) {
   );
 }
 
-export default function CoursesPageClient() {
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
+export default function CoursesPageClient({ initialCourses }: { initialCourses: Course[] }) {
   const [search, setSearch] = useState("");
 
-  useEffect(() => {
-    fetch("/api/courses")
-      .then((r) => r.json())
-      .then((d) => setCourses(d.courses || []))
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
-
-  const filtered = courses.filter(
+  const filtered = initialCourses.filter(
     (c) =>
       c.title.toLowerCase().includes(search.toLowerCase()) ||
       c.description.toLowerCase().includes(search.toLowerCase())
@@ -194,11 +185,9 @@ export default function CoursesPageClient() {
             <h2 className="text-2xl font-bold text-gray-900">
               {search ? `Results for "${search}"` : "Available Courses"}
             </h2>
-            {!loading && (
-              <p className="text-gray-400 mt-1 text-sm">
-                {filtered.length} course{filtered.length !== 1 ? "s" : ""} available
-              </p>
-            )}
+            <p className="text-gray-400 mt-1 text-sm">
+              {filtered.length} course{filtered.length !== 1 ? "s" : ""} available
+            </p>
           </div>
           <div className="flex items-center gap-2 text-gray-500 text-sm">
             <SlidersHorizontal className="w-4 h-4" />
@@ -206,16 +195,8 @@ export default function CoursesPageClient() {
           </div>
         </div>
 
-        {/* Loading */}
-        {loading && (
-          <div className="flex items-center justify-center py-24 gap-3 text-gray-400">
-            <Loader2 className="w-8 h-8 animate-spin text-green-600" />
-            <span className="text-lg">Loading courses...</span>
-          </div>
-        )}
-
         {/* No courses */}
-        {!loading && filtered.length === 0 && (
+        {filtered.length === 0 && (
           <div className="text-center py-24">
             <div className="text-6xl mb-4">🌿</div>
             <h3 className="text-xl font-semibold text-gray-700 mb-2">
@@ -246,7 +227,7 @@ export default function CoursesPageClient() {
         )}
 
         {/* Courses Grid */}
-        {!loading && filtered.length > 0 && (
+        {filtered.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
             {filtered.map((course) => (
               <CourseCard key={course.id} course={course} />
@@ -255,28 +236,26 @@ export default function CoursesPageClient() {
         )}
 
         {/* Bottom CTA */}
-        {!loading && (
-          <div className="mt-20 bg-gradient-to-br from-green-800 to-emerald-700 rounded-3xl p-10 text-center text-white">
-            <h2 className="text-3xl font-bold mb-4">Not sure which course? Ask us!</h2>
-            <p className="text-green-100 mb-8 max-w-lg mx-auto">
-              Our team is happy to help you choose the right Arabic course based on your goals and level.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link
-                href="/contact"
-                className="bg-white text-green-700 font-bold px-8 py-3 rounded-xl hover:bg-green-50 transition-colors shadow-sm"
-              >
-                Contact Us
-              </Link>
-              <a
-                href="mailto:founder@OasisOfArabic.com"
-                className="border-2 border-white/50 text-white font-bold px-8 py-3 rounded-xl hover:bg-white/10 transition-colors"
-              >
-                Email Us
-              </a>
-            </div>
+        <div className="mt-20 bg-gradient-to-br from-green-800 to-emerald-700 rounded-3xl p-10 text-center text-white">
+          <h2 className="text-3xl font-bold mb-4">Not sure which course? Ask us!</h2>
+          <p className="text-green-100 mb-8 max-w-lg mx-auto">
+            Our team is happy to help you choose the right Arabic course based on your goals and level.
+          </p>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              href="/contact"
+              className="bg-white text-green-700 font-bold px-8 py-3 rounded-xl hover:bg-green-50 transition-colors shadow-sm"
+            >
+              Contact Us
+            </Link>
+            <a
+              href="mailto:founder@OasisOfArabic.com"
+              className="border-2 border-white/50 text-white font-bold px-8 py-3 rounded-xl hover:bg-white/10 transition-colors"
+            >
+              Email Us
+            </a>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

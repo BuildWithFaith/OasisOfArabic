@@ -144,12 +144,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`scroll-smooth ${playfair.variable} ${poppins.variable}`} data-scroll-behavior="smooth">
-      <head>
-        <MetaPixel />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <MetaPixel />
         {/* Transitions removed */}
 
         {/* Wrap dynamic components in Suspense for PPR */}
@@ -176,8 +174,12 @@ export default function RootLayout({
           <PWAInstall />
         </Suspense>
 
-        <ImageProtection />
-        <CartDrawer />
+        <Suspense fallback={null}>
+          <ImageProtection />
+        </Suspense>
+        <Suspense fallback={null}>
+          <CartDrawer />
+        </Suspense>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import CoursesPageClient from "./courses-client";
+import { getActiveCourses } from "@/app/data/courses";
 
 export const metadata: Metadata = {
   title: "Arabic Courses",
@@ -8,6 +9,8 @@ export const metadata: Metadata = {
   keywords: ["Arabic courses", "Learn Arabic", "Zoom Arabic classes", "Quran Arabic"],
 };
 
-export default function CoursesPage() {
-  return <CoursesPageClient />;
+export default async function CoursesPage() {
+  const courses = await getActiveCourses();
+  
+  return <CoursesPageClient initialCourses={courses} />;
 }

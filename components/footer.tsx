@@ -80,9 +80,17 @@ export function Footer() {
           <div>
             <h4 className="text-lg font-bold text-accent mb-4">Contact Us</h4>
             <ul className="space-y-3">
+              <li className="flex items-start gap-3 text-white/80 text-sm">
+                <MapPin className="w-5 h-5 text-accent shrink-0 mt-0.5" />
+                <address className="not-italic hover:text-accent transition-colors">
+                  Main Office, Oasis of Arabic<br />
+                  [Street Address Placeholder],<br />
+                  Lahore, Pakistan
+                </address>
+              </li>
               <li className="flex items-center gap-3 text-white/80 text-sm">
                 <Phone className="w-5 h-5 text-accent shrink-0" />
-                <a href="tel:+923041117423" className="hover:text-accent transition-colors">
+                <a href="tel:03314838025" className="hover:text-accent transition-colors">
                   03314838025
                 </a>
               </li>
@@ -93,29 +101,47 @@ export function Footer() {
                 </a>
               </li>
             </ul>
-            <div className="mt-4">
+            <div className="mt-6 flex flex-wrap gap-2">
               <Link
-                href="/contact"
-                className="inline-block bg-accent text-primary px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-white transition-all duration-300 hover:scale-105 shadow-lg"
+                href="/terms"
+                className="text-[10px] uppercase tracking-widest font-bold bg-white/5 hover:bg-accent hover:text-primary px-3 py-1.5 rounded transition-all"
               >
-                Contact Us Page
+                Terms
+              </Link>
+              <Link
+                href="/privacy"
+                className="text-[10px] uppercase tracking-widest font-bold bg-white/5 hover:bg-accent hover:text-primary px-3 py-1.5 rounded transition-all"
+              >
+                Privacy
+              </Link>
+              <Link
+                href="/returns"
+                className="text-[10px] uppercase tracking-widest font-bold bg-white/5 hover:bg-accent hover:text-primary px-3 py-1.5 rounded transition-all"
+              >
+                Refunds
+              </Link>
+              <Link
+                href="/shipping"
+                className="text-[10px] uppercase tracking-widest font-bold bg-white/5 hover:bg-accent hover:text-primary px-3 py-1.5 rounded transition-all"
+              >
+                Service
               </Link>
             </div>
           </div>
         </div>
 
         {/* Bottom Bar */}
-        <div className="border-t border-white/20 mt-8 pt-6 text-center">
+        <div className="border-t border-white/20 mt-8 pt-6 flex flex-col md:flex-row justify-between items-center bg-white/5 p-4 rounded-xl">
           <p className="text-white/60 text-sm">
             © {new Date().getFullYear()} Oasis of Arabic. All rights reserved.
           </p>
-          <p className="text-white/60 text-sm mt-2">
+          <p className="text-white/60 text-sm mt-2 md:mt-0">
             Design and developed by{' '}
             <a
               href="https://contra.com/muhammadwahajofficiall_f1yj87dw/services"
               target="_blank"
               rel="noopener noreferrer"
-              className="hover:text-accent transition-colors underline decoration-dotted underline-offset-4"
+              className="hover:text-accent transition-colors underline decoration-dotted underline-offset-4 font-semibold"
             >
               Muhammad Wahaj
             </a>
