@@ -170,3 +170,12 @@ export async function deleteCourseAction(id: string) {
 
   return { success: true, deleted };
 }
+
+export async function revalidateCoursesCacheAction() {
+  const admin = await requireAdmin();
+  if (!admin) throw new Error('Unauthorized');
+
+  // @ts-expect-error Next.js 16 types mismatch for revalidateTag arguments
+  revalidateTag('courses');
+  return { success: true };
+}

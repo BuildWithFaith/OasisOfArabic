@@ -83,9 +83,7 @@ export function Footer() {
               <li className="flex items-start gap-3 text-white/80 text-sm">
                 <MapPin className="w-5 h-5 text-accent shrink-0 mt-0.5" />
                 <address className="not-italic hover:text-accent transition-colors">
-                  Main Office, Oasis of Arabic<br />
-                  [Street Address Placeholder],<br />
-                  Lahore, Pakistan
+                  Orangi Town Sector 14/B, Karachi, Pakistan
                 </address>
               </li>
               <li className="flex items-center gap-3 text-white/80 text-sm">

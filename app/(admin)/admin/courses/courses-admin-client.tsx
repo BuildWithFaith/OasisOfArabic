@@ -16,6 +16,7 @@ import {
   Clock,
   DollarSign,
   Image as ImageIcon,
+  RefreshCcw,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -65,7 +66,7 @@ function formatPrice(price: number, currency: string) {
   return `${currency} ${price.toLocaleString()}`;
 }
 
-import { createCourseAction, updateCourseAction, deleteCourseAction } from "@/app/actions/admin-courses";
+import { createCourseAction, updateCourseAction, deleteCourseAction, revalidateCoursesCacheAction } from "@/app/actions/admin-courses";
 
 export default function CoursesAdminClient({ initialCourses }: { initialCourses: Course[] }) {
   const [courses, setCourses] = useState<Course[]>(initialCourses);
@@ -78,6 +79,7 @@ export default function CoursesAdminClient({ initialCourses }: { initialCourses:
   const [uploading, setUploading] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
   const [filter, setFilter] = useState<'available' | 'unavailable'>('available');
+  const [revalidating, setRevalidating] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -187,6 +189,19 @@ export default function CoursesAdminClient({ initialCourses }: { initialCourses:
     }
   }
 
+  // ─── Manual Cache Revalidation ───────────────────────────────────
+  async function handleRevalidateCache() {
+    setRevalidating(true);
+    try {
+      await revalidateCoursesCacheAction();
+      toast.success("Cache successfully revalidated!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to revalidate cache");
+    } finally {
+      setRevalidating(false);
+    }
+  }
+
   // ─── Render ──────────────────────────────────────────────────────
   const displayedCourses = courses.filter((c) => filter === 'available' ? c.isActive : !c.isActive);
 
@@ -205,13 +220,23 @@ export default function CoursesAdminClient({ initialCourses }: { initialCourses:
                 Add, edit, or remove courses for Oasis of Arabic.
               </p>
             </div>
-            <button
-              onClick={openAdd}
-              className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow transition-colors"
-            >
-              <Plus className="w-5 h-5" />
-              Add New Course
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={handleRevalidateCache}
+                disabled={revalidating}
+                className="flex items-center gap-2 bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-4 py-2.5 rounded-xl font-semibold shadow-sm transition-colors disabled:opacity-50"
+              >
+                <RefreshCcw className={`w-5 h-5 ${revalidating ? 'animate-spin' : ''}`} />
+                Refresh Cache
+              </button>
+              <button
+                onClick={openAdd}
+                className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-semibold shadow transition-colors"
+              >
+                <Plus className="w-5 h-5" />
+                Add New Course
+              </button>
+            </div>
           </div>
 
           {/* Tabs */}
